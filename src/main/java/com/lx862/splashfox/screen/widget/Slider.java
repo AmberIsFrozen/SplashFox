@@ -16,7 +16,6 @@ public class Slider extends SliderWidget {
 
     @Override
     protected void updateMessage() {
-
     }
 
     @Override

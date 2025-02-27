@@ -2,26 +2,21 @@ package com.lx862.splashfox.render;
 
 import com.lx862.splashfox.config.Config;
 import com.lx862.splashfox.data.ImagePosition;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TriState;
-import net.minecraft.util.Util;
-
-import java.util.function.Function;
-
-import static net.minecraft.client.render.RenderPhase.*;
 
 public class FoxRenderer {
-    public static final Function<Identifier, RenderLayer> SplashFoxRenderLayer = Util.memoize((texture) -> RenderLayer.of("splashfox_gui_textured", VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS, 786432, RenderLayer.MultiPhaseParameters.builder().texture(new Texture(texture, TriState.FALSE, false)).program(POSITION_TEXTURE_COLOR_PROGRAM).transparency(TRANSLUCENT_TRANSPARENCY).depthTest(LEQUAL_DEPTH_TEST).cull(DISABLE_CULLING).build(false)));
-    private double shiftY = 0;
-    private double animationProgress = 0;
+    private final Config config;
+    private final MinecraftClient client;
 
-    public void render(MinecraftClient client, DrawContext drawContext, ImagePosition imagePosition, Config config, int mouseX, int mouseY, double elapsed, float alpha) {
+    public FoxRenderer(MinecraftClient client, Config config) {
+        this.config = config;
+        this.client = client;
+    }
+    public void render(DrawContext drawContext, ImagePosition imagePosition, int mouseX, int mouseY, double elapsed, float alpha) {
         MatrixStack matrices = drawContext.getMatrices();
         double scaleBasis = Math.min((double)client.getWindow().getScaledWidth() * 0.75, client.getWindow().getScaledHeight()) * 0.25;
         int splashScreenScale = (int)(scaleBasis * 0.5);
@@ -33,6 +28,8 @@ public class FoxRenderer {
         boolean flipped = config.flipped;
         Identifier foxImage = config.getImageIdentifier();
 
+        double animationProgress = getBounceProgress(speedFactor, elapsed / 10, wobbly);
+        final double offsetY = (dropHeight * Math.min(0, -animationProgress)) + dropHeight;
         final double centeredScreenWidth = (client.getWindow().getScaledWidth() / 2.0) - (size / 2);
         final double centeredScreenHeight = (client.getWindow().getScaledHeight() / 2.0) - dropHeight;
         final double x;
@@ -41,31 +38,31 @@ public class FoxRenderer {
         switch(imagePosition) {
             case LEFT_TO_MOJANG -> {
                 x = centeredScreenWidth - (6 * splashScreenScale);
-                y = centeredScreenHeight + shiftY;
+                y = centeredScreenHeight + offsetY;
             }
             case RIGHT_TO_MOJANG -> {
                 x = centeredScreenWidth + (6 * splashScreenScale);
-                y = centeredScreenHeight + shiftY;
+                y = centeredScreenHeight + offsetY;
             }
             case ABOVE_MOJANG -> {
                 x = centeredScreenWidth;
-                y = centeredScreenHeight - (splashScreenScale) - size + shiftY;
+                y = centeredScreenHeight - (splashScreenScale) - size + offsetY;
             }
             case REPLACE_MOJANG -> {
                 x = centeredScreenWidth;
-                y = centeredScreenHeight + shiftY;
+                y = centeredScreenHeight + offsetY;
             }
             case FOLLOW_MOUSE -> {
                 x = mouseX;
-                y = mouseY + shiftY;
+                y = mouseY + offsetY;
             }
             case GUI_PREVIEW -> {
                 x = client.getWindow().getScaledHeight() > 450 ? centeredScreenWidth : (flipped ? 0 : client.getWindow().getScaledWidth() - size);
-                y = centeredScreenHeight + shiftY;
+                y = centeredScreenHeight + offsetY;
             }
             default -> {
                 x = centeredScreenWidth;
-                y = shiftY;
+                y = offsetY;
             }
         }
 
@@ -85,11 +82,14 @@ public class FoxRenderer {
             matrices.translate(-(size / 2.0), -size, 0);
         }
 
-        drawContext.drawTexture(SplashFoxRenderLayer, foxImage, 0, 0, 0, 0, (int)size, (int)size, (int)size, (int)size, 0xFFFFFF | ((int)(alpha * 255)) << 24);
-        matrices.pop();
+        RenderSystem.enableBlend();
 
-        animationProgress = getBounceProgress(speedFactor, elapsed / 10, wobbly);
-        shiftY = (dropHeight * Math.min(0, -animationProgress)) + dropHeight;
+        RenderSystem.disableCull();
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
+        drawContext.drawTexture(foxImage, 0, 0, 0, 0, (int)size, (int)size, (int)size, (int)size);
+        RenderSystem.disableBlend();
+        RenderSystem.enableCull();
+        matrices.pop();
     }
 
     private double getBounceProgress(double speedFactor, double x, boolean wobbly) {

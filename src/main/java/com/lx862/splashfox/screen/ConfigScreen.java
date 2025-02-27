@@ -1,11 +1,12 @@
 package com.lx862.splashfox.screen;
 
+import com.lx862.splashfox.SplashFox;
 import com.lx862.splashfox.config.Config;
 import com.lx862.splashfox.data.ImagePosition;
-import com.lx862.splashfox.data.ScreenAlignment;
-import com.lx862.splashfox.SplashFox;
 import com.lx862.splashfox.render.FoxRenderer;
 import com.lx862.splashfox.screen.widget.Slider;
+import com.lx862.splashfox.data.ScreenAlignment;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -13,7 +14,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Pair;
 
@@ -43,7 +43,7 @@ public class ConfigScreen extends Screen {
         this.parentScreen = parent;
         // Make another instance of config so changes only apply if the user click save
         tmpConfigInstance = Config.readConfig();
-        foxRenderer = new FoxRenderer();
+        foxRenderer = new FoxRenderer(MinecraftClient.getInstance(), tmpConfigInstance);
         labels = new ArrayList<>();
 
         int curY = 40;
@@ -172,15 +172,19 @@ public class ConfigScreen extends Screen {
         elapsed += delta;
 
         // Render fox preview :D
-        foxRenderer.render(client, drawContext, ImagePosition.GUI_PREVIEW, tmpConfigInstance, mouseX, mouseY, elapsed, 1.0f);
+        foxRenderer.render(drawContext, ImagePosition.GUI_PREVIEW, mouseX, mouseY, elapsed, 1.0f);
 
         drawContext.drawCenteredTextWithShadow(textRenderer, title, this.width / 2, 12, 0xFFFFFF);
-        drawContext.drawTexture(RenderLayer::getGuiTextured, Screen.HEADER_SEPARATOR_TEXTURE, 0, 30, 0.0F, 0.0F, this.width, 2, 32, 2);
-        drawContext.drawTexture(RenderLayer::getGuiTextured, Screen.FOOTER_SEPARATOR_TEXTURE, 0, this.height - 40, 0.0F, 0.0F, this.width, 2, 32, 2);
+
+        RenderSystem.enableBlend();
+        drawContext.drawTexture(Screen.HEADER_SEPARATOR_TEXTURE, 0, 30, 0.0F, 0.0F, this.width, 2, 32, 2);
+        drawContext.drawTexture(Screen.FOOTER_SEPARATOR_TEXTURE, 0, this.height - 40, 0.0F, 0.0F, this.width, 2, 32, 2);
+        RenderSystem.disableBlend();
     }
 
     @Override
     public void close() {
+        assert this.client != null;
         this.client.setScreen(parentScreen);
     }
 

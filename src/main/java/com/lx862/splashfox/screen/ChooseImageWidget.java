@@ -1,9 +1,9 @@
 package com.lx862.splashfox.screen;
 
-import com.lx862.splashfox.SplashFox;
 import com.lx862.splashfox.config.Config;
 import com.lx862.splashfox.data.CustomResourceTexture;
 import com.lx862.splashfox.screen.widget.ChooseButton;
+import com.lx862.splashfox.SplashFox;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class ChooseImageWidget extends ClickableWidget {
     private static final int SCROLL_MULTIPLIER = 8;
@@ -51,14 +52,19 @@ public class ChooseImageWidget extends ClickableWidget {
             Path builtInPath = Path.of(SplashFox.class.getResource("/assets/splashfox/textures/gui/").toURI());
             Path customPath = Config.CUSTOM_IMG_PATH;
 
-            Files.list(builtInPath).forEach(filePath -> {
-                builtInImages.add(addImageButton(filePath, false));
-            });
-            Files.list(customPath).forEach(filePath -> {
-                customImages.add(addImageButton(filePath, true));
-            });
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            try(Stream<Path> pathStream = Files.list(builtInPath);
+                Stream<Path> customPathStream = Files.list(customPath)
+            ) {
+                pathStream.forEach(filePath -> {
+                    builtInImages.add(addImageButton(filePath, false));
+                });
+
+                customPathStream.forEach(filePath -> {
+                    customImages.add(addImageButton(filePath, true));
+                });
+            }
+        } catch (Exception e) {
+            SplashFox.LOGGER.error("", e);
         }
 
         subWidgets.clear();

@@ -1,10 +1,10 @@
 package com.lx862.splashfox.screen;
 
 import com.lx862.splashfox.config.Config;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 
 public class ChooseImageScreen extends Screen {
@@ -45,8 +45,11 @@ public class ChooseImageScreen extends Screen {
         super.render(drawContext, mouseX, mouseY, delta);
 
         drawContext.drawCenteredTextWithShadow(textRenderer, title, width / 2, 10, 0xFFFFFFFF);
-        drawContext.drawTexture(RenderLayer::getGuiTextured, Screen.HEADER_SEPARATOR_TEXTURE, 0, 30 - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
-        drawContext.drawTexture(RenderLayer::getGuiTextured, Screen.FOOTER_SEPARATOR_TEXTURE, 0, height - 40, 0.0F, 0.0F, this.width, 2, 32, 2);
+
+        RenderSystem.enableBlend();
+        drawContext.drawTexture(Screen.HEADER_SEPARATOR_TEXTURE, 0, 30 - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
+        drawContext.drawTexture(Screen.FOOTER_SEPARATOR_TEXTURE, 0, height - 40, 0.0F, 0.0F, this.width, 2, 32, 2);
+        RenderSystem.disableBlend();
 
         chooseImageWidget.render(drawContext, mouseX, mouseY, delta);
     }

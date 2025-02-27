@@ -1,14 +1,13 @@
 package com.lx862.splashfox.mixin;
 
-import com.lx862.splashfox.config.Config;
-import com.lx862.splashfox.data.BuiltinResourceTexture;
 import com.lx862.splashfox.SplashFox;
+import com.lx862.splashfox.config.Config;
 import com.lx862.splashfox.data.CustomResourceTexture;
 import com.lx862.splashfox.render.FoxRenderer;
+import com.lx862.splashfox.data.BuiltinResourceTexture;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
-import net.minecraft.client.texture.TextureManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
@@ -25,23 +24,23 @@ public class SplashOverlayMixin {
 	@Unique private static final Identifier EMPTY_LOGO = Identifier.of("splashfox", "textures/empty.png");
 	@Shadow @Final private boolean reloading;
 	@Shadow @Final private MinecraftClient client;
-	@Shadow @Final public static Identifier LOGO;
+	@Shadow @Final static Identifier LOGO;
 	@Shadow private long reloadCompleteTime;
 	@Shadow private long reloadStartTime;
 	@Unique private double elapsed;
 	@Unique private FoxRenderer renderer;
 
 	@Inject(at = @At("HEAD"), method = "init", cancellable = true)
-	private static void init(TextureManager textureManager, CallbackInfo ci) {
+	private static void init(MinecraftClient client, CallbackInfo ci) {
 		Identifier imageId = SplashFox.config.getImageIdentifier();
 		if(SplashFox.config.usesCustomImage()) {
-			textureManager.registerTexture(imageId, new CustomResourceTexture(SplashFox.config.customPath, imageId));
+			client.getTextureManager().registerTexture(imageId, new CustomResourceTexture(SplashFox.config.customPath, imageId));
 		} else {
-			textureManager.registerTexture(imageId, new BuiltinResourceTexture(imageId));
+			client.getTextureManager().registerTexture(imageId, new BuiltinResourceTexture(imageId));
 		}
 
 		if(SplashFox.config.position.mojangLogoHidden) {
-			textureManager.registerTexture(LOGO, new BuiltinResourceTexture(EMPTY_LOGO));
+			client.getTextureManager().registerTexture(LOGO, new BuiltinResourceTexture(EMPTY_LOGO));
 			ci.cancel();
 		}
 	}
@@ -50,16 +49,16 @@ public class SplashOverlayMixin {
 	private void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
 		ensureTextureRegistered();
 
-		if(renderer == null) renderer = new FoxRenderer();
+		if(renderer == null) renderer = new FoxRenderer(this.client, SplashFox.config);
 		elapsed += delta;
-		renderer.render(this.client, context, SplashFox.config.position, SplashFox.config, mouseX, mouseY, elapsed, getOverlayAlpha());
+		renderer.render(context, SplashFox.config.position, mouseX, mouseY, elapsed, getOverlayAlpha());
 	}
 
 	// The init method is only called once on startup, call init again if any settings is mismatched
 	@Unique
 	private void ensureTextureRegistered() {
 		if(Config.needUpdateTexture) {
-			SplashOverlay.init(this.client.getTextureManager());
+			SplashOverlay.init(this.client);
 			Config.needUpdateTexture = false;
 		}
 	}

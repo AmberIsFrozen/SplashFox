@@ -3,7 +3,6 @@ package com.lx862.splashfox.data;
 import net.minecraft.client.resource.metadata.TextureResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.ResourceTexture;
-import net.minecraft.client.texture.TextureContents;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
@@ -16,16 +15,16 @@ public class BuiltinResourceTexture extends ResourceTexture {
     }
 
     @Override
-    public TextureContents loadContents(ResourceManager resourceManager) {
-        final Identifier textureId = getId();
+    protected TextureData loadTextureData(ResourceManager resourceManager) {
+        final Identifier textureId = location;
 
         try {
             InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("assets/" + textureId.getNamespace() + "/" + textureId.getPath());
-            TextureContents texture = null;
+            TextureData texture = null;
 
             if(input != null) {
                 try {
-                    texture = new TextureContents(NativeImage.read(input), new TextureResourceMetadata(true, true));
+                    texture = new TextureData(new TextureResourceMetadata(true, true), NativeImage.read(input));
                 } finally {
                     input.close();
                 }
@@ -33,7 +32,7 @@ public class BuiltinResourceTexture extends ResourceTexture {
 
             return texture;
         } catch (IOException exception) {
-            return TextureContents.createMissing();
+            return new TextureData(exception);
         }
     }
 }
