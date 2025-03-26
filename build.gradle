@@ -18,6 +18,9 @@ repositories {
 	// for more information about repositories.
 
 	maven { url = "https://maven.terraformersmc.com/" }
+
+	// MixinSquared
+	maven { url = "https://maven.bawnorton.com/releases" }
 }
 
 dependencies {
@@ -29,6 +32,9 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	// Other stuff
+	include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.2.0")))
 }
 
 processResources {
