@@ -24,7 +24,8 @@
     ]
   },
   "mixins": [
-    "splashfox.mixins.json"
+    "splashfox.mixins.json",
+    "splashfox-compat.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.16.5",
