@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(SplashOverlay.class)
 public class SplashOverlayMixin {
 	@Unique private static final Identifier EMPTY_LOGO = Identifier.of("splashfox", "textures/empty.png");
+
 	@Shadow @Final private boolean reloading;
 	@Shadow @Final private MinecraftClient client;
 	@Shadow @Final public static Identifier LOGO;
@@ -66,9 +67,9 @@ public class SplashOverlayMixin {
 
 	@Unique
 	private float getOverlayAlpha() {
-		long l = Util.getMeasuringTimeMs();
-		float f = this.reloadCompleteTime > -1L ? (float)(l - this.reloadCompleteTime) / 1000.0F : -1.0F;
-		float g = this.reloadStartTime > -1L ? (float)(l - this.reloadStartTime) / 500.0F : -1.0F;
+		long timeNow = Util.getMeasuringTimeMs();
+		float f = this.reloadCompleteTime > -1L ? (float)(timeNow - this.reloadCompleteTime) / 1000.0F : -1.0F;
+		float g = this.reloadStartTime > -1L ? (float)(timeNow - this.reloadStartTime) / 500.0F : -1.0F;
 
 		if (f >= 1.0F) {
 			return 1.0F - MathHelper.clamp(f - 1.0F, 0.0F, 1.0F);

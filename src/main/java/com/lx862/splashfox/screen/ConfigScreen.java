@@ -7,14 +7,15 @@ import com.lx862.splashfox.SplashFox;
 import com.lx862.splashfox.render.FoxRenderer;
 import com.lx862.splashfox.screen.widget.Slider;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Pair;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ConfigScreen extends Screen {
+    private static final int MAX_WIDTH = 320;
     private final Slider dropHeightSlider;
     private final Slider foxSizeSlider;
     private final Slider speedSlider;
@@ -32,11 +34,10 @@ public class ConfigScreen extends Screen {
     private final ButtonWidget discardButton;
     private final ButtonWidget saveButton;
     private final List<Pair<String, Integer>> labels;
-    private static final int SCREEN_WIDTH = 320;
-    private double elapsed;
     private final Config tmpConfigInstance;
     private final FoxRenderer foxRenderer;
     private final Screen parentScreen;
+    private double elapsed;
 
     public ConfigScreen(Screen parent) {
         super(Text.translatable("splashfox.gui.config_title"));
@@ -65,8 +66,7 @@ public class ConfigScreen extends Screen {
         curY += 20;
 
         dropHeightSlider = new Slider(0, curY, 100, 20, Text.literal(String.valueOf(tmpConfigInstance.dropHeight)), tmpConfigInstance.dropHeight, 3, (slider) -> {
-            double val = slider.getValue();
-            tmpConfigInstance.dropHeight = val;
+            tmpConfigInstance.dropHeight = slider.getValue();
         });
         labels.add(new Pair<>("splashfox.gui.drop_height", curY));
 
@@ -139,13 +139,13 @@ public class ConfigScreen extends Screen {
         positionButton.setWidth(120);
         positionButton.setX(getX(positionButton, ScreenAlignment.RIGHT));
 
-        discardButton.setWidth(SCREEN_WIDTH / 2);
+        discardButton.setWidth(MAX_WIDTH / 2);
         discardButton.setX(getX(saveButton, ScreenAlignment.LEFT));
-        discardButton.setY(client.getWindow().getScaledHeight() - saveButton.getHeight() - 10);
+        discardButton.setY(this.height - saveButton.getHeight() - 10);
 
-        saveButton.setWidth(SCREEN_WIDTH / 2);
+        saveButton.setWidth(MAX_WIDTH / 2);
         saveButton.setX(getX(saveButton, ScreenAlignment.RIGHT));
-        saveButton.setY(client.getWindow().getScaledHeight() - saveButton.getHeight() - 10);
+        saveButton.setY(this.height - saveButton.getHeight() - 10);
 
         addDrawableChild(chooseImageButton);
         addDrawableChild(speedSlider);
@@ -174,9 +174,9 @@ public class ConfigScreen extends Screen {
         // Render fox preview :D
         foxRenderer.render(client, drawContext, ImagePosition.GUI_PREVIEW, tmpConfigInstance, mouseX, mouseY, elapsed, 1.0f);
 
-        drawContext.drawCenteredTextWithShadow(textRenderer, title, this.width / 2, 12, 0xFFFFFF);
-        drawContext.drawTexture(RenderLayer::getGuiTextured, Screen.HEADER_SEPARATOR_TEXTURE, 0, 30, 0.0F, 0.0F, this.width, 2, 32, 2);
-        drawContext.drawTexture(RenderLayer::getGuiTextured, Screen.FOOTER_SEPARATOR_TEXTURE, 0, this.height - 40, 0.0F, 0.0F, this.width, 2, 32, 2);
+        drawContext.drawCenteredTextWithShadow(textRenderer, title, this.width / 2, 12, Colors.WHITE);
+        drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, Screen.HEADER_SEPARATOR_TEXTURE, 0, 30, 0.0F, 0.0F, this.width, 2, 32, 2);
+        drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR_TEXTURE, 0, this.height - 40, 0.0F, 0.0F, this.width, 2, 32, 2);
     }
 
     @Override
@@ -187,7 +187,7 @@ public class ConfigScreen extends Screen {
     private int getX(int width, ScreenAlignment type) {
         if(client != null) {
             int scaledWidth = client.getWindow().getScaledWidth();
-            int startX = (scaledWidth - SCREEN_WIDTH) / 2;
+            int startX = (scaledWidth - MAX_WIDTH) / 2;
 
             if(type == ScreenAlignment.LEFT) {
                 return startX;

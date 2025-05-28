@@ -6,8 +6,9 @@ import net.minecraft.text.Text;
 import java.util.function.Consumer;
 
 public class Slider extends SliderWidget {
-    private final int scale;
     private final Consumer<Slider> onApplyValue;
+    private final int scale;
+
     public Slider(int x, int y, int width, int height, Text text, double value, int scale, Consumer<Slider> onApplyValue) {
         super(x, y, width, height, text, value / scale);
         this.onApplyValue = onApplyValue;

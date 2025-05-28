@@ -12,6 +12,7 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import org.apache.commons.io.FilenameUtils;
 
@@ -57,8 +58,8 @@ public class ChooseImageWidget extends ClickableWidget {
             Files.list(customPath).forEach(filePath -> {
                 customImages.add(addImageButton(filePath, true));
             });
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            SplashFox.LOGGER.error("", e);
         }
 
         subWidgets.clear();
@@ -142,12 +143,12 @@ public class ChooseImageWidget extends ClickableWidget {
             button.active = buttonInVisibleArea;
         }
 
-        context.getMatrices().push();
-        context.getMatrices().translate(getX(), getY() - scrolledOffset, 0);
+        context.getMatrices().pushMatrix();
+        context.getMatrices().translate(getX(), (float)(getY() - scrolledOffset));
         Text customImageText = Text.translatable("splashfox.gui.custom_img");
-        context.drawTextWithShadow(textRenderer, customImageText, 0, customImageSeparatorY, 0xFFFFFF);
+        context.drawTextWithShadow(textRenderer, customImageText, 0, customImageSeparatorY, Colors.WHITE);
         context.fill(textRenderer.getWidth(customImageText) + 4, customImageSeparatorY + (textRenderer.fontHeight / 2), getWidth(), customImageSeparatorY + (textRenderer.fontHeight / 2) + 1, 0xFFAAAAAA);
-        context.getMatrices().pop();
+        context.getMatrices().popMatrix();
 
         context.disableScissor();
     }

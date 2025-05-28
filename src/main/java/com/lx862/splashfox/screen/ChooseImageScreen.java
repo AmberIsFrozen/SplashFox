@@ -1,25 +1,21 @@
 package com.lx862.splashfox.screen;
 
 import com.lx862.splashfox.config.Config;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.Window;
 import net.minecraft.text.Text;
 
 public class ChooseImageScreen extends Screen {
     private static final double CHOOSER_WIDTH_FACTOR = 0.75;
     private final Screen parentScreen;
-    private final ButtonWidget doneButton;
     private final ChooseImageWidget chooseImageWidget;
 
     public ChooseImageScreen(Screen parentScreen, Config configInstance) {
         super(Text.translatable("splashfox.gui.choose_img"));
         this.parentScreen = parentScreen;
-        doneButton = new ButtonWidget.Builder(Text.translatable("splashfox.gui.done"), (btn) -> {
-            close();
-        }).size(200, 20).build();
         chooseImageWidget = new ChooseImageWidget(this::addSelectableChild, configInstance.usesCustomImage() ? configInstance.customPath : configInstance.imagePath, configInstance);
     }
 
@@ -28,8 +24,11 @@ public class ChooseImageScreen extends Screen {
         super.init();
         Window window = client.getWindow();
 
-        doneButton.setX((window.getScaledWidth() / 2) - (doneButton.getWidth() / 2));
-        doneButton.setY(window.getScaledHeight() - 30);
+        ButtonWidget doneButton = new ButtonWidget.Builder(Text.translatable("splashfox.gui.done"), (btn) -> this.close())
+                .size(200, 20)
+                .position((window.getScaledWidth() / 2) - (200 / 2), window.getScaledHeight() - 30)
+                .build();
+        addDrawableChild(doneButton);
 
         int availWidth = (int)(client.getWindow().getScaledWidth() * CHOOSER_WIDTH_FACTOR);
         int startX = (client.getWindow().getScaledWidth() - availWidth) / 2;
@@ -38,7 +37,6 @@ public class ChooseImageScreen extends Screen {
         chooseImageWidget.setWidth(availWidth);
         chooseImageWidget.setHeight(client.getWindow().getScaledHeight() - 70);
         chooseImageWidget.init();
-        addDrawableChild(doneButton);
         addSelectableChild(chooseImageWidget);
     }
 
@@ -47,8 +45,8 @@ public class ChooseImageScreen extends Screen {
         super.render(drawContext, mouseX, mouseY, delta);
 
         drawContext.drawCenteredTextWithShadow(textRenderer, title, width / 2, 10, 0xFFFFFFFF);
-        drawContext.drawTexture(RenderLayer::getGuiTextured, Screen.HEADER_SEPARATOR_TEXTURE, 0, 30 - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
-        drawContext.drawTexture(RenderLayer::getGuiTextured, Screen.FOOTER_SEPARATOR_TEXTURE, 0, height - 40, 0.0F, 0.0F, this.width, 2, 32, 2);
+        drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, Screen.HEADER_SEPARATOR_TEXTURE, 0, 30 - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
+        drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR_TEXTURE, 0, height - 40, 0.0F, 0.0F, this.width, 2, 32, 2);
 
         chooseImageWidget.render(drawContext, mouseX, mouseY, delta);
     }

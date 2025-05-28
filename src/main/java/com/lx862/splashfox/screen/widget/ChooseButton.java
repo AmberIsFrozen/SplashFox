@@ -1,16 +1,16 @@
 package com.lx862.splashfox.screen.widget;
 
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class ChooseButton extends ButtonWidget {
+    public static final int PADDING = 4;
+    private final Identifier buttonTexture;
     private boolean selected;
     private int baseY;
-    private final Identifier buttonTexture;
-    public static final int PADDING = 4;
 
     public ChooseButton(int x, int y, int width, int height, boolean selected, Identifier buttonTexture, ButtonWidget.PressAction pressAction, Text text) {
         super(x, y, width, height, text, pressAction, DEFAULT_NARRATION_SUPPLIER);
@@ -34,7 +34,7 @@ public class ChooseButton extends ButtonWidget {
             // Selected
             drawContext.drawBorder(startX, startY, sizeWidth, sizeHeight, 0x66FFFFFF);
         }
-        drawContext.drawTexture(RenderLayer::getGuiTextured, buttonTexture, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
+        drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, buttonTexture, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
     }
 
     public void setSelected(boolean bl) {
