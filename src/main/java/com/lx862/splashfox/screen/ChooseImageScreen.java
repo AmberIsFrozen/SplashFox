@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.util.Window;
 import net.minecraft.text.Text;
 
 public class ChooseImageScreen extends Screen {
@@ -25,9 +26,10 @@ public class ChooseImageScreen extends Screen {
     @Override
     protected void init() {
         super.init();
+        Window window = client.getWindow();
 
-        doneButton.setX((client.getWindow().getScaledWidth() / 2) - (doneButton.getWidth() / 2));
-        doneButton.setY(client.getWindow().getScaledHeight() - 30);
+        doneButton.setX((window.getScaledWidth() / 2) - (doneButton.getWidth() / 2));
+        doneButton.setY(window.getScaledHeight() - 30);
 
         int availWidth = (int)(client.getWindow().getScaledWidth() * CHOOSER_WIDTH_FACTOR);
         int startX = (client.getWindow().getScaledWidth() - availWidth) / 2;

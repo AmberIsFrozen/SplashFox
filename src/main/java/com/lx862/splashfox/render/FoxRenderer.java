@@ -2,11 +2,12 @@ package com.lx862.splashfox.render;
 
 import com.lx862.splashfox.config.Config;
 import com.lx862.splashfox.data.ImagePosition;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TriState;
@@ -14,10 +15,9 @@ import net.minecraft.util.Util;
 
 import java.util.function.Function;
 
-import static net.minecraft.client.render.RenderPhase.*;
-
 public class FoxRenderer {
-    public static final Function<Identifier, RenderLayer> SplashFoxRenderLayer = Util.memoize((texture) -> RenderLayer.of("splashfox_gui_textured", VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS, 786432, RenderLayer.MultiPhaseParameters.builder().texture(new Texture(texture, TriState.FALSE, false)).program(POSITION_TEXTURE_COLOR_PROGRAM).transparency(TRANSLUCENT_TRANSPARENCY).depthTest(LEQUAL_DEPTH_TEST).cull(DISABLE_CULLING).build(false)));
+    private static final RenderPipeline GUI_NO_CULL = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.POSITION_TEX_COLOR_SNIPPET).withLocation("pipeline/gui_textured").withCull(false).build());
+    public static final Function<Identifier, RenderLayer> SplashFoxRenderLayer = Util.memoize((texture) -> RenderLayer.of("splashfox_gui_textured", 786432, GUI_NO_CULL, RenderLayer.MultiPhaseParameters.builder().texture(new RenderPhase.Texture(texture, TriState.FALSE, false)).build(false)));
     private double shiftY = 0;
     private double animationProgress = 0;
 

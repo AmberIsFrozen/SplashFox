@@ -34,8 +34,8 @@ public class Config {
             SplashFox.LOGGER.info("[SplashFox] Reading Config...");
             try {
                 return new Gson().fromJson(Files.readString(configFile), Config.class);
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (Exception e) {
+                SplashFox.LOGGER.error("Failed to read config!", e);
             }
         } else {
             SplashFox.LOGGER.info("[SplashFox] Config not found, generating one...");
@@ -67,7 +67,7 @@ public class Config {
             CONFIG_PATH.toFile().mkdirs();
             Files.write(CONFIG_PATH.resolve("config.json"), Collections.singleton(new GsonBuilder().setPrettyPrinting().create().toJson(element)));
         } catch (Exception e) {
-            e.printStackTrace();
+            SplashFox.LOGGER.error("Failed to write config!", e);
         }
     }
 }

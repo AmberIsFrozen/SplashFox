@@ -2,7 +2,7 @@ package com.lx862.splashfox.screen;
 
 import com.lx862.splashfox.SplashFox;
 import com.lx862.splashfox.config.Config;
-import com.lx862.splashfox.data.CustomResourceTexture;
+import com.lx862.splashfox.data.FileSystemResourceTexture;
 import com.lx862.splashfox.screen.widget.ChooseButton;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -109,10 +109,8 @@ public class ChooseImageWidget extends ClickableWidget {
         String fileName = filePath.getFileName().toString();
         String fileNameNoExtension = FilenameUtils.removeExtension(fileName);
         Identifier id = custom ? sessionInstance.getCustomImageIdentifier(fileName) : Identifier.of("splashfox", "textures/gui/" + fileName);
-        if(!custom) {
-            MinecraftClient.getInstance().getTextureManager().getTexture(id).bindTexture();
-        } else {
-            MinecraftClient.getInstance().getTextureManager().registerTexture(id, new CustomResourceTexture(fileName, id));
+        if(custom) {
+            MinecraftClient.getInstance().getTextureManager().registerTexture(id, new FileSystemResourceTexture(fileName, id));
         }
 
         ChooseButton chooseButton = new ChooseButton(0, 0, BUTTON_SIZE, BUTTON_SIZE, initialSelection.equals(custom ? fileName : id.toString()), id, e -> {

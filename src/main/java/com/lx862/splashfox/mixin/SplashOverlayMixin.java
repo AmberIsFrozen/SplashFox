@@ -3,7 +3,7 @@ package com.lx862.splashfox.mixin;
 import com.lx862.splashfox.config.Config;
 import com.lx862.splashfox.data.BuiltinResourceTexture;
 import com.lx862.splashfox.SplashFox;
-import com.lx862.splashfox.data.CustomResourceTexture;
+import com.lx862.splashfox.data.FileSystemResourceTexture;
 import com.lx862.splashfox.render.FoxRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -35,7 +35,7 @@ public class SplashOverlayMixin {
 	private static void init(TextureManager textureManager, CallbackInfo ci) {
 		Identifier imageId = SplashFox.config.getImageIdentifier();
 		if(SplashFox.config.usesCustomImage()) {
-			textureManager.registerTexture(imageId, new CustomResourceTexture(SplashFox.config.customPath, imageId));
+			textureManager.registerTexture(imageId, new FileSystemResourceTexture(SplashFox.config.customPath, imageId));
 		} else {
 			textureManager.registerTexture(imageId, new BuiltinResourceTexture(imageId));
 		}

@@ -12,10 +12,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 
-public class CustomResourceTexture extends ResourceTexture {
+/**
+ * A texture that reads an image on the user's filesystem.
+ */
+public class FileSystemResourceTexture extends ResourceTexture {
     private final String relativePath;
 
-    public CustomResourceTexture(String relativePath, Identifier location) {
+    public FileSystemResourceTexture(String relativePath, Identifier location) {
         super(location);
         this.relativePath = relativePath;
     }

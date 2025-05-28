@@ -2,7 +2,7 @@
 A mod that displays a bouncy blobfox on Minecraft loading screen, because yes.  
 
 ## Config
-A GUI configuration screen is available on 1.19.3 and above by installing Mod Menu.  
+A GUI configuration screen is available on 1.19.3+ by installing Mod Menu.  
 You may also modify the config file manually under `Your_Game_Instances/config/splashfox/config.json` in circumstances where the Config GUI does not work.  
 Configurable item as follows:  
 

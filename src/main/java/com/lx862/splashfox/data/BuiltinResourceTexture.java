@@ -1,5 +1,6 @@
 package com.lx862.splashfox.data;
 
+import com.lx862.splashfox.SplashFox;
 import net.minecraft.client.resource.metadata.TextureResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.ResourceTexture;
@@ -18,22 +19,15 @@ public class BuiltinResourceTexture extends ResourceTexture {
     @Override
     public TextureContents loadContents(ResourceManager resourceManager) {
         final Identifier textureId = getId();
+        final String path = "assets/" + textureId.getNamespace() + "/" + textureId.getPath();
 
-        try {
-            InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("assets/" + textureId.getNamespace() + "/" + textureId.getPath());
-            TextureContents texture = null;
-
+        try(InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(path)) {
             if(input != null) {
-                try {
-                    texture = new TextureContents(NativeImage.read(input), new TextureResourceMetadata(true, true));
-                } finally {
-                    input.close();
-                }
+                return new TextureContents(NativeImage.read(input), new TextureResourceMetadata(true, true));
             }
-
-            return texture;
-        } catch (IOException exception) {
-            return TextureContents.createMissing();
+        } catch (IOException e) {
+            SplashFox.LOGGER.error("Failed to read internal path {}", path, e);
         }
+        return TextureContents.createMissing();
     }
 }
