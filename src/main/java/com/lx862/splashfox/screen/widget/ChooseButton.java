@@ -2,6 +2,7 @@ package com.lx862.splashfox.screen.widget;
 
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.cursor.StandardCursors;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -28,11 +29,21 @@ public class ChooseButton extends ButtonWidget {
         int endX = getX() + getWidth() + PADDING;
         int endY = getY() + getHeight() + PADDING;
         if(selected) {
+            drawContext.fill(startX-1, startY-1, startX + sizeWidth+1, startY + sizeHeight+1, 0xFFFFFFFF);
             drawContext.fill(startX, startY, endX, endY, 0xFF000000);
-            drawContext.drawBorder(startX, startY, sizeWidth, sizeHeight, 0xFFFFFFFF);
         } else if (this.isHovered() || this.isFocused()) {
-            // Selected
-            drawContext.drawBorder(startX, startY, sizeWidth, sizeHeight, 0x66FFFFFF);
+            int eX = startX + sizeWidth;
+            int eY = startY + sizeHeight;
+            // top bottom
+            drawContext.fill(startX, startY-1, eX, startY, 0x66FFFFFF);
+            drawContext.fill(startX, eY, eX, eY+1, 0x66FFFFFF);
+
+            // left right (includ. corner)
+            drawContext.fill(startX-1, startY-1, startX, eY+1, 0x66FFFFFF);
+            drawContext.fill(eX, startY-1, eX+1, eY+1, 0x66FFFFFF);
+        }
+        if (this.isHovered()) {
+            drawContext.setCursor(StandardCursors.POINTING_HAND);
         }
         drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, buttonTexture, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
     }

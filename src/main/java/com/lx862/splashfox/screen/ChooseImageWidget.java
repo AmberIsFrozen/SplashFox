@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
@@ -159,9 +160,9 @@ public class ChooseImageWidget extends ClickableWidget {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyInput keyInput) {
         // Handle the key press first, so the new element that get selected is reflected before we do our check
-        boolean bl = super.keyPressed(keyCode, scanCode, modifiers);
+        boolean bl = super.keyPressed(keyInput);
 
         for(ChooseButton chooseButton : subWidgets) {
             if(chooseButton.isSelected()) {
