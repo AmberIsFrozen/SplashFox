@@ -1,12 +1,12 @@
 package com.lx862.splashfox.screen;
 
 import com.lx862.splashfox.config.Config;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.Window;
-import net.minecraft.text.Text;
+import com.mojang.blaze3d.platform.Window;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
 
 public class ChooseImageScreen extends Screen {
     private static final double CHOOSER_WIDTH_FACTOR = 0.75;
@@ -14,46 +14,46 @@ public class ChooseImageScreen extends Screen {
     private final ChooseImageWidget chooseImageWidget;
 
     public ChooseImageScreen(Screen parentScreen, Config configInstance) {
-        super(Text.translatable("splashfox.gui.choose_img"));
+        super(Component.translatable("splashfox.gui.choose_img"));
         this.parentScreen = parentScreen;
-        chooseImageWidget = new ChooseImageWidget(this::addSelectableChild, configInstance.usesCustomImage() ? configInstance.customPath : configInstance.imagePath, configInstance);
+        chooseImageWidget = new ChooseImageWidget(this::addWidget, configInstance.usesCustomImage() ? configInstance.customPath : configInstance.imagePath, configInstance);
     }
 
     @Override
     protected void init() {
         super.init();
-        Window window = client.getWindow();
+        Window window = minecraft.getWindow();
 
-        ButtonWidget doneButton = new ButtonWidget.Builder(Text.translatable("splashfox.gui.done"), (btn) -> this.close())
+        Button doneButton = new Button.Builder(Component.translatable("splashfox.gui.done"), (btn) -> this.onClose())
                 .size(200, 20)
-                .position((window.getScaledWidth() / 2) - (200 / 2), window.getScaledHeight() - 30)
+                .pos((window.getGuiScaledWidth() / 2) - (200 / 2), window.getGuiScaledHeight() - 30)
                 .build();
-        addDrawableChild(doneButton);
+        addRenderableWidget(doneButton);
 
-        int availWidth = (int)(client.getWindow().getScaledWidth() * CHOOSER_WIDTH_FACTOR);
-        int startX = (client.getWindow().getScaledWidth() - availWidth) / 2;
+        int availWidth = (int)(minecraft.getWindow().getGuiScaledWidth() * CHOOSER_WIDTH_FACTOR);
+        int startX = (minecraft.getWindow().getGuiScaledWidth() - availWidth) / 2;
         chooseImageWidget.setX(startX);
         chooseImageWidget.setY(30);
         chooseImageWidget.setWidth(availWidth);
-        chooseImageWidget.setHeight(client.getWindow().getScaledHeight() - 70);
+        chooseImageWidget.setHeight(minecraft.getWindow().getGuiScaledHeight() - 70);
         chooseImageWidget.init();
-        addSelectableChild(chooseImageWidget);
+        addWidget(chooseImageWidget);
     }
 
     @Override
-    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        super.render(drawContext, mouseX, mouseY, delta);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        super.render(guiGraphics, mouseX, mouseY, delta);
 
-        drawContext.drawCenteredTextWithShadow(textRenderer, title, width / 2, 10, 0xFFFFFFFF);
-        drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, Screen.HEADER_SEPARATOR_TEXTURE, 0, 30 - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
-        drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR_TEXTURE, 0, height - 40, 0.0F, 0.0F, this.width, 2, 32, 2);
+        guiGraphics.drawCenteredString(font, title, width / 2, 10, 0xFFFFFFFF);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, Screen.HEADER_SEPARATOR, 0, 30 - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, 0, height - 40, 0.0F, 0.0F, this.width, 2, 32, 2);
 
-        chooseImageWidget.render(drawContext, mouseX, mouseY, delta);
+        chooseImageWidget.render(guiGraphics, mouseX, mouseY, delta);
     }
 
     @Override
-    public void close() {
-        this.client.setScreen(parentScreen);
+    public void onClose() {
+        minecraft.setScreen(parentScreen);
     }
 
     @Override

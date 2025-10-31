@@ -1,27 +1,27 @@
 package com.lx862.splashfox.screen.widget;
 
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.cursor.StandardCursors;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
-public class ChooseButton extends ButtonWidget {
+public class ChooseButton extends Button {
     public static final int PADDING = 4;
-    private final Identifier buttonTexture;
+    private final ResourceLocation buttonTextureId;
     private boolean selected;
     private int baseY;
 
-    public ChooseButton(int x, int y, int width, int height, boolean selected, Identifier buttonTexture, ButtonWidget.PressAction pressAction, Text text) {
-        super(x, y, width, height, text, pressAction, DEFAULT_NARRATION_SUPPLIER);
+    public ChooseButton(int x, int y, int width, int height, boolean selected, ResourceLocation buttonTextureId, Button.OnPress pressAction, Component text) {
+        super(x, y, width, height, text, pressAction, DEFAULT_NARRATION);
         this.baseY = y;
-        this.buttonTexture = buttonTexture;
+        this.buttonTextureId = buttonTextureId;
         this.selected = selected;
     }
 
     @Override
-    public void renderWidget(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         int startX = getX() - PADDING;
         int startY = getY() - PADDING;
         int sizeWidth = getWidth() + PADDING + PADDING;
@@ -29,23 +29,23 @@ public class ChooseButton extends ButtonWidget {
         int endX = getX() + getWidth() + PADDING;
         int endY = getY() + getHeight() + PADDING;
         if(selected) {
-            drawContext.fill(startX-1, startY-1, startX + sizeWidth+1, startY + sizeHeight+1, 0xFFFFFFFF);
-            drawContext.fill(startX, startY, endX, endY, 0xFF000000);
+            guiGraphics.fill(startX-1, startY-1, startX + sizeWidth+1, startY + sizeHeight+1, 0xFFFFFFFF);
+            guiGraphics.fill(startX, startY, endX, endY, 0xFF000000);
         } else if (this.isHovered() || this.isFocused()) {
             int eX = startX + sizeWidth;
             int eY = startY + sizeHeight;
             // top bottom
-            drawContext.fill(startX, startY-1, eX, startY, 0x66FFFFFF);
-            drawContext.fill(startX, eY, eX, eY+1, 0x66FFFFFF);
+            guiGraphics.fill(startX, startY-1, eX, startY, 0x66FFFFFF);
+            guiGraphics.fill(startX, eY, eX, eY+1, 0x66FFFFFF);
 
             // left right (includ. corner)
-            drawContext.fill(startX-1, startY-1, startX, eY+1, 0x66FFFFFF);
-            drawContext.fill(eX, startY-1, eX+1, eY+1, 0x66FFFFFF);
+            guiGraphics.fill(startX-1, startY-1, startX, eY+1, 0x66FFFFFF);
+            guiGraphics.fill(eX, startY-1, eX+1, eY+1, 0x66FFFFFF);
         }
         if (this.isHovered()) {
-            drawContext.setCursor(StandardCursors.POINTING_HAND);
+            guiGraphics.requestCursor(CursorTypes.POINTING_HAND);
         }
-        drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, buttonTexture, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, buttonTextureId, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
     }
 
     public void setSelected(boolean bl) {

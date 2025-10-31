@@ -4,17 +4,17 @@ import com.lx862.splashfox.SplashFox;
 import com.lx862.splashfox.config.Config;
 import com.lx862.splashfox.data.FileSystemResourceTexture;
 import com.lx862.splashfox.screen.widget.ChooseButton;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
 import org.apache.commons.io.FilenameUtils;
 
 import java.nio.file.Files;
@@ -23,25 +23,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class ChooseImageWidget extends ClickableWidget {
+public class ChooseImageWidget extends AbstractWidget {
     private static final int SCROLL_MULTIPLIER = 8;
     private static final int BUTTON_Y_MARGIN = 20;
     private static final int BUTTON_SIZE = 40;
     private final List<ChooseButton> subWidgets;
-    private final Consumer<ButtonWidget> addDrawableChild;
+    private final Consumer<Button> addDrawableChild;
     private final String initialSelection;
     private final Config sessionInstance;
-    private final TextRenderer textRenderer;
+    private final Font font;
     private double scrolledOffset = 0;
     private int totalHeight = 0;
     private int customImageSeparatorY;
 
-    public ChooseImageWidget(Consumer<ButtonWidget> addSelectableChild, String initialSelection, Config sessionInstance) {
-        super(50, 50, 50, 50, Text.literal(""));
+    public ChooseImageWidget(Consumer<Button> addSelectableChild, String initialSelection, Config sessionInstance) {
+        super(50, 50, 50, 50, Component.literal(""));
         this.initialSelection = initialSelection;
         this.addDrawableChild = addSelectableChild;
         this.sessionInstance = sessionInstance;
-        this.textRenderer = MinecraftClient.getInstance().textRenderer;
+        this.font = Minecraft.getInstance().font;
         subWidgets = new ArrayList<>();
     }
 
@@ -110,21 +110,21 @@ public class ChooseImageWidget extends ClickableWidget {
     public ChooseButton addImageButton(Path filePath, boolean custom) {
         String fileName = filePath.getFileName().toString();
         String fileNameNoExtension = FilenameUtils.removeExtension(fileName);
-        Identifier id = custom ? sessionInstance.getCustomImageIdentifier(fileName) : Identifier.of("splashfox", "textures/gui/" + fileName);
+        ResourceLocation location = custom ? sessionInstance.getCustomImageId(fileName) : ResourceLocation.fromNamespaceAndPath("splashfox", "textures/gui/" + fileName);
         if(custom) {
-            MinecraftClient.getInstance().getTextureManager().registerTexture(id, new FileSystemResourceTexture(fileName, id));
+            Minecraft.getInstance().getTextureManager().register(location, new FileSystemResourceTexture(fileName, location));
         }
 
-        ChooseButton chooseButton = new ChooseButton(0, 0, BUTTON_SIZE, BUTTON_SIZE, initialSelection.equals(custom ? fileName : id.toString()), id, e -> {
-            sessionInstance.imagePath = custom ? null : id.toString();
+        ChooseButton chooseButton = new ChooseButton(0, 0, BUTTON_SIZE, BUTTON_SIZE, initialSelection.equals(custom ? fileName : location.toString()), location, e -> {
+            sessionInstance.imagePath = custom ? null : location.toString();
             sessionInstance.customPath = custom ? fileName : null;
             for(ChooseButton btn : subWidgets) {
                 btn.setSelected(false);
             }
             ((ChooseButton)e).setSelected(true);
-        }, Text.literal(fileNameNoExtension));
+        }, Component.literal(fileNameNoExtension));
 
-        chooseButton.setTooltip(Tooltip.of(Text.literal(custom ? "Custom: " + fileNameNoExtension : fileNameNoExtension)));
+        chooseButton.setTooltip(Tooltip.create(Component.literal(custom ? "Custom: " + fileNameNoExtension : fileNameNoExtension)));
         return chooseButton;
     }
 
@@ -135,37 +135,37 @@ public class ChooseImageWidget extends ClickableWidget {
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
+    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        guiGraphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
 
-        for(ButtonWidget button : subWidgets) {
-            final boolean buttonInVisibleArea = mouseY >= 30 && mouseY <= MinecraftClient.getInstance().getWindow().getScaledHeight() - 40;
-            button.render(context, mouseX, mouseY, delta);
+        for(Button button : subWidgets) {
+            final boolean buttonInVisibleArea = mouseY >= 30 && mouseY <= Minecraft.getInstance().getWindow().getGuiScaledHeight() - 40;
+            button.render(guiGraphics, mouseX, mouseY, delta);
             button.active = buttonInVisibleArea;
         }
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().translate(getX(), (float)(getY() - scrolledOffset));
-        Text customImageText = Text.translatable("splashfox.gui.custom_img");
-        context.drawTextWithShadow(textRenderer, customImageText, 0, customImageSeparatorY, Colors.WHITE);
-        context.fill(textRenderer.getWidth(customImageText) + 4, customImageSeparatorY + (textRenderer.fontHeight / 2), getWidth(), customImageSeparatorY + (textRenderer.fontHeight / 2) + 1, 0xFFAAAAAA);
-        context.getMatrices().popMatrix();
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(getX(), (float)(getY() - scrolledOffset));
+        Component customImageText = Component.translatable("splashfox.gui.custom_img");
+        guiGraphics.drawString(font, customImageText, 0, customImageSeparatorY, CommonColors.WHITE);
+        guiGraphics.fill(font.width(customImageText) + 4, customImageSeparatorY + (font.lineHeight / 2), getWidth(), customImageSeparatorY + (font.lineHeight / 2) + 1, 0xFFAAAAAA);
+        guiGraphics.pose().popMatrix();
 
-        context.disableScissor();
+        guiGraphics.disableScissor();
     }
 
     @Override
-    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+    protected void updateWidgetNarration(NarrationElementOutput builder) {
 
     }
 
     @Override
-    public boolean keyPressed(KeyInput keyInput) {
+    public boolean keyPressed(KeyEvent keyInput) {
         // Handle the key press first, so the new element that get selected is reflected before we do our check
         boolean bl = super.keyPressed(keyInput);
 
         for(ChooseButton chooseButton : subWidgets) {
-            if(chooseButton.isSelected()) {
+            if(chooseButton.isHoveredOrFocused()) {
                 int highestY = chooseButton.getY() - ChooseButton.PADDING;
                 int lowestY = chooseButton.getY() + chooseButton.getHeight() + ChooseButton.PADDING;
                 if(lowestY > height + scrolledOffset) {

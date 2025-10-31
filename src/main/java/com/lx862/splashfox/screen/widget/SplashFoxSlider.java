@@ -1,15 +1,15 @@
 package com.lx862.splashfox.screen.widget;
 
-import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.network.chat.Component;
 
 import java.util.function.Consumer;
 
-public class Slider extends SliderWidget {
-    private final Consumer<Slider> onApplyValue;
+public class SplashFoxSlider extends AbstractSliderButton {
+    private final Consumer<SplashFoxSlider> onApplyValue;
     private final int scale;
 
-    public Slider(int x, int y, int width, int height, Text text, double value, int scale, Consumer<Slider> onApplyValue) {
+    public SplashFoxSlider(int x, int y, int width, int height, Component text, double value, int scale, Consumer<SplashFoxSlider> onApplyValue) {
         super(x, y, width, height, text, value / scale);
         this.onApplyValue = onApplyValue;
         this.scale = scale;
@@ -24,7 +24,7 @@ public class Slider extends SliderWidget {
     protected void applyValue() {
         value = Math.round(value * 100.0) / 100.0;
         onApplyValue.accept(this);
-        setMessage(Text.literal(String.valueOf(Math.round((value * scale) * 100.0) / 100.0)));
+        setMessage(Component.literal(String.valueOf(Math.round((value * scale) * 100.0) / 100.0)));
     }
 
     public double getValue() {

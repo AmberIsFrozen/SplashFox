@@ -3,24 +3,24 @@ package com.lx862.splashfox.render;
 import com.lx862.splashfox.config.Config;
 import com.lx862.splashfox.data.ImagePosition;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.CommonColors;
 import org.joml.Matrix3x2fStack;
 
 public class FoxRenderer {
-    private static final RenderPipeline GUI_NO_CULL = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.POSITION_TEX_COLOR_SNIPPET).withLocation("pipeline/gui_textured").withCull(false).build());
+    private static final RenderPipeline GUI_NO_CULL = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.GUI_TEXTURED_SNIPPET).withLocation("pipeline/gui_textured").withCull(false).build());
     private double shiftY = 0;
     private double animationProgress = 0;
 
-    public void render(MinecraftClient client, DrawContext drawContext, ImagePosition imagePosition, Config config, int mouseX, int mouseY, double elapsed, float alpha) {
-        Identifier foxImage = config.getImageIdentifier();
+    public void render(Minecraft minecraft, GuiGraphics guiGraphics, ImagePosition imagePosition, Config config, int mouseX, int mouseY, double elapsed, float alpha) {
+        ResourceLocation foxImage = config.getImageId();
 
-        Matrix3x2fStack matrices = drawContext.getMatrices();
-        double scaleBasis = Math.min((double)client.getWindow().getScaledWidth() * 0.75, client.getWindow().getScaledHeight()) * 0.25;
+        Matrix3x2fStack matrices = guiGraphics.pose();
+        double scaleBasis = Math.min((double)minecraft.getWindow().getGuiScaledWidth() * 0.75, minecraft.getWindow().getGuiScaledHeight()) * 0.25;
         int splashScreenScale = (int)(scaleBasis * 0.5);
 
         float size = (float)config.foxSize * splashScreenScale;
@@ -29,8 +29,8 @@ public class FoxRenderer {
         boolean wobbly = config.wobbly;
         boolean flipped = config.flipped;
 
-        final double centeredScreenWidth = (client.getWindow().getScaledWidth() / 2.0) - (size / 2);
-        final double centeredScreenHeight = (client.getWindow().getScaledHeight() / 2.0) - dropHeight;
+        final double centeredScreenWidth = (minecraft.getWindow().getGuiScaledWidth() / 2.0) - (size / 2);
+        final double centeredScreenHeight = (minecraft.getWindow().getGuiScaledHeight() / 2.0) - dropHeight;
         final double x;
         final double y;
 
@@ -56,7 +56,7 @@ public class FoxRenderer {
                 y = mouseY + shiftY;
             }
             case GUI_PREVIEW -> {
-                x = client.getWindow().getScaledHeight() > 450 ? centeredScreenWidth : (flipped ? 0 : client.getWindow().getScaledWidth() - size);
+                x = minecraft.getWindow().getGuiScaledHeight() > 450 ? centeredScreenWidth : (flipped ? 0 : minecraft.getWindow().getGuiScaledWidth() - size);
                 y = centeredScreenHeight + shiftY;
             }
             default -> {
@@ -81,7 +81,7 @@ public class FoxRenderer {
             matrices.translate(-(size / 2f), -size);
         }
 
-        drawContext.drawTexture(GUI_NO_CULL, foxImage, 0, 0, 0, 0, (int)size, (int)size, (int)size, (int)size, ColorHelper.withAlpha(alpha, Colors.WHITE));
+        guiGraphics.blit(GUI_NO_CULL, foxImage, 0, 0, 0, 0, (int)size, (int)size, (int)size, (int)size, ARGB.color(alpha, CommonColors.WHITE));
         matrices.popMatrix();
 
         animationProgress = getBounceProgress(speedFactor, elapsed / 10, wobbly);
