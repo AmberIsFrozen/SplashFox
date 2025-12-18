@@ -5,15 +5,15 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ChooseButton extends Button {
     public static final int PADDING = 4;
-    private final ResourceLocation buttonTextureId;
+    private final Identifier buttonTextureId;
     private boolean selected;
     private int baseY;
 
-    public ChooseButton(int x, int y, int width, int height, boolean selected, ResourceLocation buttonTextureId, Button.OnPress pressAction, Component text) {
+    public ChooseButton(int x, int y, int width, int height, boolean selected, Identifier buttonTextureId, Button.OnPress pressAction, Component text) {
         super(x, y, width, height, text, pressAction, DEFAULT_NARRATION);
         this.baseY = y;
         this.buttonTextureId = buttonTextureId;
@@ -21,7 +21,7 @@ public class ChooseButton extends Button {
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
         int startX = getX() - PADDING;
         int startY = getY() - PADDING;
         int sizeWidth = getWidth() + PADDING + PADDING;

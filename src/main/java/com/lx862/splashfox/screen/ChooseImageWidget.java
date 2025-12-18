@@ -13,7 +13,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import org.apache.commons.io.FilenameUtils;
 
@@ -36,13 +36,13 @@ public class ChooseImageWidget extends AbstractWidget {
     private int totalHeight = 0;
     private int customImageSeparatorY;
 
-    public ChooseImageWidget(Consumer<Button> addSelectableChild, String initialSelection, Config sessionInstance) {
-        super(50, 50, 50, 50, Component.literal(""));
+    public ChooseImageWidget(Font font, Consumer<Button> addSelectableChild, String initialSelection, Config sessionInstance) {
+        super(50, 50, 50, 50, Component.literal("Choose an image"));
         this.initialSelection = initialSelection;
         this.addDrawableChild = addSelectableChild;
         this.sessionInstance = sessionInstance;
-        this.font = Minecraft.getInstance().font;
-        subWidgets = new ArrayList<>();
+        this.font = font;
+        this.subWidgets = new ArrayList<>();
     }
 
     public void init() {
@@ -110,13 +110,13 @@ public class ChooseImageWidget extends AbstractWidget {
     public ChooseButton addImageButton(Path filePath, boolean custom) {
         String fileName = filePath.getFileName().toString();
         String fileNameNoExtension = FilenameUtils.removeExtension(fileName);
-        ResourceLocation location = custom ? sessionInstance.getCustomImageId(fileName) : ResourceLocation.fromNamespaceAndPath("splashfox", "textures/gui/" + fileName);
+        Identifier imageId = custom ? sessionInstance.getCustomImageId(fileName) : Identifier.fromNamespaceAndPath("splashfox", "textures/gui/" + fileName);
         if(custom) {
-            Minecraft.getInstance().getTextureManager().register(location, new FileSystemResourceTexture(fileName, location));
+            Minecraft.getInstance().getTextureManager().register(imageId, new FileSystemResourceTexture(fileName, imageId));
         }
 
-        ChooseButton chooseButton = new ChooseButton(0, 0, BUTTON_SIZE, BUTTON_SIZE, initialSelection.equals(custom ? fileName : location.toString()), location, e -> {
-            sessionInstance.imagePath = custom ? null : location.toString();
+        ChooseButton chooseButton = new ChooseButton(0, 0, BUTTON_SIZE, BUTTON_SIZE, initialSelection.equals(custom ? fileName : imageId.toString()), imageId, e -> {
+            sessionInstance.imagePath = custom ? null : imageId.toString();
             sessionInstance.customPath = custom ? fileName : null;
             for(ChooseButton btn : subWidgets) {
                 btn.setSelected(false);

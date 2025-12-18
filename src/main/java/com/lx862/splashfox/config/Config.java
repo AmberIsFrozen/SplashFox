@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import com.lx862.splashfox.data.ImagePosition;
 import com.lx862.splashfox.SplashFox;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,16 +48,16 @@ public class Config {
         return customPath != null;
     }
 
-    public ResourceLocation getBuiltinImageId() {
-        return ResourceLocation.parse(imagePath);
+    public Identifier getBuiltinImageId() {
+        return Identifier.parse(imagePath);
     }
 
-    public ResourceLocation getImageId() {
+    public Identifier getImageId() {
         return usesCustomImage() ? getCustomImageId(customPath) : getBuiltinImageId();
     }
 
-    public ResourceLocation getCustomImageId(String customPath) {
-        return ResourceLocation.fromNamespaceAndPath("splashfox", "custom_img_" + customPath);
+    public Identifier getCustomImageId(String customPath) {
+        return Identifier.fromNamespaceAndPath("splashfox", "custom_img_" + customPath);
     }
 
     public static void writeConfig(Config instance) {

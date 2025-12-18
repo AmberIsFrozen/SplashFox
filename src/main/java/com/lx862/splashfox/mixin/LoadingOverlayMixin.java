@@ -5,13 +5,13 @@ import com.lx862.splashfox.data.BuiltinResourceTexture;
 import com.lx862.splashfox.SplashFox;
 import com.lx862.splashfox.data.FileSystemResourceTexture;
 import com.lx862.splashfox.render.FoxRenderer;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,11 +22,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LoadingOverlay.class)
 public class LoadingOverlayMixin {
-	@Unique private static final ResourceLocation EMPTY_LOGO = ResourceLocation.fromNamespaceAndPath("splashfox", "textures/empty.png");
+	@Unique private static final Identifier EMPTY_LOGO = Identifier.fromNamespaceAndPath("splashfox", "textures/empty.png");
 
 	@Shadow @Final private boolean fadeIn;
 	@Shadow @Final private Minecraft minecraft;
-	@Shadow @Final public static ResourceLocation MOJANG_STUDIOS_LOGO_LOCATION;
+	@Shadow @Final public static Identifier MOJANG_STUDIOS_LOGO_LOCATION;
 	@Shadow private long fadeOutStart;
 	@Shadow private long fadeInStart;
 	@Unique private double elapsed;
@@ -34,7 +34,7 @@ public class LoadingOverlayMixin {
 
 	@Inject(at = @At("HEAD"), method = "registerTextures", cancellable = true)
 	private static void splashfox$registerTextures(TextureManager textureManager, CallbackInfo ci) {
-		ResourceLocation imageId = SplashFox.config.getImageId();
+        Identifier imageId = SplashFox.config.getImageId();
 		if(SplashFox.config.usesCustomImage()) {
 			textureManager.registerAndLoad(imageId, new FileSystemResourceTexture(SplashFox.config.customPath, imageId));
 		} else {

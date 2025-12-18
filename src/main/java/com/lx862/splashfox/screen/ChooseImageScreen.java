@@ -16,7 +16,7 @@ public class ChooseImageScreen extends Screen {
     public ChooseImageScreen(Screen parentScreen, Config configInstance) {
         super(Component.translatable("splashfox.gui.choose_img"));
         this.parentScreen = parentScreen;
-        chooseImageWidget = new ChooseImageWidget(this::addWidget, configInstance.usesCustomImage() ? configInstance.customPath : configInstance.imagePath, configInstance);
+        chooseImageWidget = new ChooseImageWidget(getFont(), this::addWidget, configInstance.usesCustomImage() ? configInstance.customPath : configInstance.imagePath, configInstance);
     }
 
     @Override

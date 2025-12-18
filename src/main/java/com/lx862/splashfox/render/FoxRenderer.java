@@ -6,7 +6,7 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
 import org.joml.Matrix3x2fStack;
@@ -17,7 +17,7 @@ public class FoxRenderer {
     private double animationProgress = 0;
 
     public void render(Minecraft minecraft, GuiGraphics guiGraphics, ImagePosition imagePosition, Config config, int mouseX, int mouseY, double elapsed, float alpha) {
-        ResourceLocation foxImage = config.getImageId();
+        Identifier foxImage = config.getImageId();
 
         Matrix3x2fStack matrices = guiGraphics.pose();
         double scaleBasis = Math.min((double)minecraft.getWindow().getGuiScaledWidth() * 0.75, minecraft.getWindow().getGuiScaledHeight()) * 0.25;

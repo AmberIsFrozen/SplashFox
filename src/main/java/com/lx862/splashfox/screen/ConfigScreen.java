@@ -6,7 +6,6 @@ import com.lx862.splashfox.data.ScreenAlignment;
 import com.lx862.splashfox.SplashFox;
 import com.lx862.splashfox.render.FoxRenderer;
 import com.lx862.splashfox.screen.widget.SplashFoxSlider;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -24,16 +23,6 @@ import java.util.List;
 
 public class ConfigScreen extends Screen {
     private static final int MAX_WIDTH = 320;
-    private final SplashFoxSlider dropHeightSlider;
-    private final SplashFoxSlider foxSizeSlider;
-    private final SplashFoxSlider speedSlider;
-    private final Checkbox flippedCheckbox;
-    private final Checkbox wobblyCheckbox;
-    private final Button chooseImageButton;
-    private final Button positionButton;
-    private final Button discardButton;
-    private final Button saveButton;
-    private final List<Tuple<String, Integer>> labels;
     private final Config tmpConfigInstance;
     private final FoxRenderer foxRenderer;
     private final Screen parentScreen;
@@ -45,129 +34,105 @@ public class ConfigScreen extends Screen {
         // Make another instance of config so changes only apply if the user click save
         tmpConfigInstance = Config.readConfig();
         foxRenderer = new FoxRenderer();
-        labels = new ArrayList<>();
-
-        int curY = 40;
-
-        chooseImageButton = new Button.Builder(Component.translatable("splashfox.gui.choose"), (d) -> {
-            ChooseImageScreen chooseImageScreen = new ChooseImageScreen(this, tmpConfigInstance);
-            minecraft.setScreen(chooseImageScreen);
-        }).build();
-        chooseImageButton.setY(curY);
-        labels.add(new Tuple<>("splashfox.gui.choose_img", curY));
-
-        curY += 20;
-
-        speedSlider = new SplashFoxSlider(0, curY, 100, 20, Component.literal(String.valueOf(tmpConfigInstance.speed)), tmpConfigInstance.speed, 2, (slider) -> {
-            tmpConfigInstance.speed = slider.getValue();
-        });
-        labels.add(new Tuple<>("splashfox.gui.speed", curY));
-
-        curY += 20;
-
-        dropHeightSlider = new SplashFoxSlider(0, curY, 100, 20, Component.literal(String.valueOf(tmpConfigInstance.dropHeight)), tmpConfigInstance.dropHeight, 3, (slider) -> {
-            tmpConfigInstance.dropHeight = slider.getValue();
-        });
-        labels.add(new Tuple<>("splashfox.gui.drop_height", curY));
-
-        curY += 20;
-
-        foxSizeSlider = new SplashFoxSlider(0, curY, 100, 20, Component.literal(String.valueOf(tmpConfigInstance.foxSize)), tmpConfigInstance.foxSize, 2, (slider) -> {
-            tmpConfigInstance.foxSize = slider.getValue();
-        });
-        labels.add(new Tuple<>("splashfox.gui.blobfox_size", curY));
-
-        curY += 20;
-
-        flippedCheckbox = Checkbox.builder(Component.literal(""), Minecraft.getInstance().font)
-                .selected(tmpConfigInstance.flipped)
-                .pos(0, curY)
-                .onValueChange((btn, checked) -> {
-                    tmpConfigInstance.flipped = checked;
-                }).build();
-        labels.add(new Tuple<>("splashfox.gui.flipped", curY));
-
-        curY += 20;
-
-        wobblyCheckbox = Checkbox.builder(Component.literal(""), Minecraft.getInstance().font)
-                .selected(tmpConfigInstance.wobbly)
-                .pos(0, curY)
-                .onValueChange((btn, checked) -> {
-                    tmpConfigInstance.wobbly = checked;
-                }).build();
-        labels.add(new Tuple<>("splashfox.gui.wobbly", curY));
-
-        curY += 20;
-
-        positionButton = new Button.Builder(Component.translatable("splashfox.gui.position." + tmpConfigInstance.position.toString()), (d) -> {
-            int index = tmpConfigInstance.position.ordinal();
-            ImagePosition[] imagePositions = Arrays.stream(ImagePosition.values()).filter(e -> e.selectable).toArray(ImagePosition[]::new);
-            tmpConfigInstance.position = imagePositions[(index + 1) % imagePositions.length];
-            d.setMessage(Component.translatable("splashfox.gui.position." + tmpConfigInstance.position.toString()));
-        }).build();
-
-        positionButton.setY(curY);
-        labels.add(new Tuple<>("splashfox.gui.position", curY));
-
-        curY += 20;
-
-        discardButton = new Button.Builder(Component.translatable("splashfox.gui.discard_config"), (d) -> {
-            onClose();
-        }).build();
-
-        saveButton = new Button.Builder(Component.translatable("splashfox.gui.save_config"), (d) -> {
-            Config.needUpdateTexture = true;
-            Config.writeConfig(tmpConfigInstance);
-            SplashFox.config = Config.readConfig();
-            onClose();
-        }).build();
     }
 
     @Override
     protected void init() {
         super.init();
 
-        chooseImageButton.setWidth(100);
-        chooseImageButton.setX(getX(chooseImageButton, ScreenAlignment.RIGHT));
+        int curY = 40;
+        List<Tuple<String, Integer>> labels = new ArrayList<>();
 
-        speedSlider.setX(getX(speedSlider, ScreenAlignment.RIGHT));
-        dropHeightSlider.setX(getX(dropHeightSlider, ScreenAlignment.RIGHT));
-        foxSizeSlider.setX(getX(foxSizeSlider, ScreenAlignment.RIGHT));
-        flippedCheckbox.setX(getX(flippedCheckbox, ScreenAlignment.RIGHT));
-        wobblyCheckbox.setX(getX(wobblyCheckbox, ScreenAlignment.RIGHT));
-
-        positionButton.setWidth(120);
-        positionButton.setX(getX(positionButton, ScreenAlignment.RIGHT));
-
-        discardButton.setWidth(MAX_WIDTH / 2);
-        discardButton.setX(getX(saveButton, ScreenAlignment.LEFT));
-        discardButton.setY(this.height - saveButton.getHeight() - 10);
-
-        saveButton.setWidth(MAX_WIDTH / 2);
-        saveButton.setX(getX(saveButton, ScreenAlignment.RIGHT));
-        saveButton.setY(this.height - saveButton.getHeight() - 10);
-
+        Button chooseImageButton = new Button.Builder(Component.translatable("splashfox.gui.choose"), (d) -> {
+            ChooseImageScreen chooseImageScreen = new ChooseImageScreen(this, tmpConfigInstance);
+            minecraft.setScreen(chooseImageScreen);
+        }).pos(getX(100, ScreenAlignment.RIGHT), curY).width(100).build();
+        labels.add(new Tuple<>("splashfox.gui.choose_img", curY));
         addRenderableWidget(chooseImageButton);
+
+        curY += 20;
+
+        SplashFoxSlider speedSlider = new SplashFoxSlider(getX(100, ScreenAlignment.RIGHT), curY, 100, 20, Component.literal(String.valueOf(tmpConfigInstance.speed)), tmpConfigInstance.speed, 2, (slider) -> {
+            tmpConfigInstance.speed = slider.getValue();
+        });
+        labels.add(new Tuple<>("splashfox.gui.speed", curY));
         addRenderableWidget(speedSlider);
+
+        curY += 20;
+
+        SplashFoxSlider dropHeightSlider = new SplashFoxSlider(getX(100, ScreenAlignment.RIGHT), curY, 100, 20, Component.literal(String.valueOf(tmpConfigInstance.dropHeight)), tmpConfigInstance.dropHeight, 3, (slider) -> {
+            tmpConfigInstance.dropHeight = slider.getValue();
+        });
+        labels.add(new Tuple<>("splashfox.gui.drop_height", curY));
         addRenderableWidget(dropHeightSlider);
+
+        curY += 20;
+
+        SplashFoxSlider foxSizeSlider = new SplashFoxSlider(getX(100, ScreenAlignment.RIGHT), curY, 100, 20, Component.literal(String.valueOf(tmpConfigInstance.foxSize)), tmpConfigInstance.foxSize, 2, (slider) -> {
+            tmpConfigInstance.foxSize = slider.getValue();
+        });
+        labels.add(new Tuple<>("splashfox.gui.blobfox_size", curY));
         addRenderableWidget(foxSizeSlider);
+
+        curY += 20;
+
+        Checkbox flippedCheckbox = Checkbox.builder(Component.literal(""), font)
+                .selected(tmpConfigInstance.flipped)
+                .pos(0, curY)
+                .onValueChange((btn, checked) -> {
+                    tmpConfigInstance.flipped = checked;
+                }).build();
+        flippedCheckbox.setX(getX(flippedCheckbox, ScreenAlignment.RIGHT));
+        labels.add(new Tuple<>("splashfox.gui.flipped", curY));
         addRenderableWidget(flippedCheckbox);
+
+        curY += 20;
+
+        Checkbox wobblyCheckbox = Checkbox.builder(Component.literal(""), font)
+                .selected(tmpConfigInstance.wobbly)
+                .pos(0, curY)
+                .onValueChange((btn, checked) -> {
+                    tmpConfigInstance.wobbly = checked;
+                }).build();
+        wobblyCheckbox.setX(getX(wobblyCheckbox, ScreenAlignment.RIGHT));
+        labels.add(new Tuple<>("splashfox.gui.wobbly", curY));
         addRenderableWidget(wobblyCheckbox);
+
+        curY += 20;
+
+        Button positionButton = new Button.Builder(Component.translatable("splashfox.gui.position." + tmpConfigInstance.position.toString()), (d) -> {
+            int index = tmpConfigInstance.position.ordinal();
+            ImagePosition[] imagePositions = Arrays.stream(ImagePosition.values()).filter(e -> e.selectable).toArray(ImagePosition[]::new);
+            tmpConfigInstance.position = imagePositions[(index + 1) % imagePositions.length];
+            d.setMessage(Component.translatable("splashfox.gui.position." + tmpConfigInstance.position.toString()));
+        }).pos(getX(120, ScreenAlignment.RIGHT), curY).width(120).build();
+
+        labels.add(new Tuple<>("splashfox.gui.position", curY));
         addRenderableWidget(positionButton);
+
+        Button discardButton = new Button.Builder(Component.translatable("splashfox.gui.discard_config"),
+                (d) -> onClose()
+        ).pos(getX((MAX_WIDTH/2), ScreenAlignment.LEFT), this.height - 30).width(MAX_WIDTH / 2).build();
         addRenderableWidget(discardButton);
+
+        Button saveButton = new Button.Builder(Component.translatable("splashfox.gui.save_config"), (d) -> {
+            Config.needUpdateTexture = true;
+            Config.writeConfig(tmpConfigInstance);
+            SplashFox.config = Config.readConfig();
+            onClose();
+        }).pos(getX((MAX_WIDTH/2), ScreenAlignment.RIGHT), this.height - 30).width(MAX_WIDTH / 2).build();
         addRenderableWidget(saveButton);
 
         for(Tuple<String, Integer> label : labels) {
-            StringWidget tw = new StringWidget(Component.translatable(label.getA()), font);
-            tw.setX(getStartX());
-            tw.setY(label.getB() + font.lineHeight);
-            addRenderableWidget(tw);
+            StringWidget labelWidget = new StringWidget(Component.translatable(label.getA()), font);
+            labelWidget.setX(getStartX());
+            labelWidget.setY(label.getB() + font.lineHeight);
+            addRenderableWidget(labelWidget);
         }
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        if(minecraft == null) return;
         super.render(guiGraphics, mouseX, mouseY, delta);
         elapsed += delta;
 
@@ -185,21 +150,19 @@ public class ConfigScreen extends Screen {
     }
 
     private int getX(int width, ScreenAlignment type) {
-        if(minecraft != null) {
-            int scaledWidth = minecraft.getWindow().getGuiScaledWidth();
-            int startX = (scaledWidth - MAX_WIDTH) / 2;
+        int scaledWidth = minecraft.getWindow().getGuiScaledWidth();
+        int startX = (scaledWidth - MAX_WIDTH) / 2;
 
-            if(type == ScreenAlignment.LEFT) {
-                return startX;
-            }
+        if(type == ScreenAlignment.LEFT) {
+            return startX;
+        }
 
-            if(type == ScreenAlignment.CENTERED) {
-                return (scaledWidth / 2) - (width / 2);
-            }
+        if(type == ScreenAlignment.CENTERED) {
+            return (scaledWidth / 2) - (width / 2);
+        }
 
-            if(type == ScreenAlignment.RIGHT) {
-                return scaledWidth - startX - width;
-            }
+        if(type == ScreenAlignment.RIGHT) {
+            return scaledWidth - startX - width;
         }
 
         return 0;
@@ -208,6 +171,7 @@ public class ConfigScreen extends Screen {
     private int getX(AbstractWidget widget, ScreenAlignment type) {
         return getX(widget.getWidth(), type);
     }
+
 
     private int getStartX() {
         return getX(0, ScreenAlignment.LEFT);

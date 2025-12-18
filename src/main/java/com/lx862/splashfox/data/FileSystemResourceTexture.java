@@ -2,10 +2,11 @@ package com.lx862.splashfox.data;
 
 import com.lx862.splashfox.config.Config;
 import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.client.renderer.texture.MipmapStrategy;
 import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.client.renderer.texture.TextureContents;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.nio.file.Files;
 public class FileSystemResourceTexture extends SimpleTexture {
     private final String relativePath;
 
-    public FileSystemResourceTexture(String relativePath, ResourceLocation id) {
+    public FileSystemResourceTexture(String relativePath, Identifier id) {
         super(id);
         this.relativePath = relativePath;
     }
@@ -26,7 +27,7 @@ public class FileSystemResourceTexture extends SimpleTexture {
     @Override
     public TextureContents loadContents(ResourceManager resourceManager) {
         try(InputStream input = Files.newInputStream(Config.CUSTOM_IMG_PATH.resolve(relativePath))) {
-            return new TextureContents(NativeImage.read(input), new TextureMetadataSection(true, true));
+            return new TextureContents(NativeImage.read(input), new TextureMetadataSection(true, true, MipmapStrategy.MEAN, TextureMetadataSection.DEFAULT_ALPHA_CUTOFF_BIAS));
         } catch (IOException exception) {
             return TextureContents.createMissing();
         }
