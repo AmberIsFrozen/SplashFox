@@ -112,7 +112,7 @@ public class ChooseImageWidget extends AbstractWidget {
         String fileNameNoExtension = FilenameUtils.removeExtension(fileName);
         Identifier imageId = custom ? sessionInstance.getCustomImageId(fileName) : Identifier.fromNamespaceAndPath("splashfox", "textures/gui/" + fileName);
         if(custom) {
-            Minecraft.getInstance().getTextureManager().register(imageId, new FileSystemResourceTexture(fileName, imageId));
+            Minecraft.getInstance().getTextureManager().registerAndLoad(imageId, new FileSystemResourceTexture(fileName, imageId));
         }
 
         ChooseButton chooseButton = new ChooseButton(0, 0, BUTTON_SIZE, BUTTON_SIZE, initialSelection.equals(custom ? fileName : imageId.toString()), imageId, e -> {
