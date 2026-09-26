@@ -135,23 +135,23 @@ public class ChooseImageWidget extends AbstractWidget {
     }
 
     @Override
-    protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float delta) {
-        guiGraphicsExtractor.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
+    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        graphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
 
         for(Button button : subWidgets) {
             final boolean buttonInVisibleArea = mouseY >= 30 && mouseY <= Minecraft.getInstance().getWindow().getGuiScaledHeight() - 40;
-            button.extractRenderState(guiGraphicsExtractor, mouseX, mouseY, delta);
+            button.extractRenderState(graphics, mouseX, mouseY, delta);
             button.active = buttonInVisibleArea;
         }
 
-        guiGraphicsExtractor.pose().pushMatrix();
-        guiGraphicsExtractor.pose().translate(getX(), (float)(getY() - scrolledOffset));
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(getX(), (float)(getY() - scrolledOffset));
         Component customImageText = Component.translatable("splashfox.gui.custom_img");
-        guiGraphicsExtractor.text(font, customImageText, 0, customImageSeparatorY, CommonColors.WHITE);
-        guiGraphicsExtractor.fill(font.width(customImageText) + 4, customImageSeparatorY + (font.lineHeight / 2), getWidth(), customImageSeparatorY + (font.lineHeight / 2) + 1, 0xFFAAAAAA);
-        guiGraphicsExtractor.pose().popMatrix();
+        graphics.text(font, customImageText, 0, customImageSeparatorY, CommonColors.WHITE);
+        graphics.fill(font.width(customImageText) + 4, customImageSeparatorY + (font.lineHeight / 2), getWidth(), customImageSeparatorY + (font.lineHeight / 2) + 1, 0xFFAAAAAA);
+        graphics.pose().popMatrix();
 
-        guiGraphicsExtractor.disableScissor();
+        graphics.disableScissor();
     }
 
     @Override

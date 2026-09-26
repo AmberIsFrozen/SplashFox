@@ -41,14 +41,14 @@ public class ChooseImageScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(guiGraphicsExtractor, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
 
-        guiGraphicsExtractor.centeredText(font, title, width / 2, 10, 0xFFFFFFFF);
-        guiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, Screen.HEADER_SEPARATOR, 0, 30 - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
-        guiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, 0, height - 40, 0.0F, 0.0F, this.width, 2, 32, 2);
+        graphics.centeredText(font, title, width / 2, 10, 0xFFFFFFFF);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.HEADER_SEPARATOR, 0, 30 - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, 0, height - 40, 0.0F, 0.0F, this.width, 2, 32, 2);
 
-        chooseImageWidget.extractRenderState(guiGraphicsExtractor, mouseX, mouseY, delta);
+        chooseImageWidget.extractRenderState(graphics, mouseX, mouseY, delta);
     }
 
     @Override
